@@ -1,0 +1,1315 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur de Devis Freelance</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --background-color: #f9f9f9;
+            --text-color: #333;
+            --border-color: #ddd;
+            --card-bg: #fff;
+            --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            --input-bg: #fff;
+        }
+
+        [data-theme="dark"] {
+            --primary-color: #5dade2;
+            --secondary-color: #58d68d;
+            --background-color: #1a1a1a;
+            --text-color: #f0f0f0;
+            --border-color: #444;
+            --card-bg: #2d2d2d;
+            --shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+            --input-bg: #3d3d3d;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 24px;
+            color: var(--text-color);
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab.active {
+            border-bottom: 3px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+        }
+
+        button {
+            padding: 10px 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        button.secondary {
+            background-color: var(--secondary-color);
+        }
+
+        button.danger {
+            background-color: #e74c3c;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .search-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-top: none;
+            z-index: 100;
+            max-height: 200px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .search-result-item {
+            padding: 10px;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .search-result-item:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        .quote-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .quote-summary {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid var(--border-color);
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .total {
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 2px solid var(--border-color);
+        }
+
+        .actions {
+            margin-top: 20px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background-color: var(--secondary-color);
+            color: white;
+            border-radius: 4px;
+            box-shadow: var(--shadow);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .notification.show {
+            opacity: 1;
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .logo-preview {
+            max-width: 200px;
+            max-height: 100px;
+            margin-top: 10px;
+            display: block;
+        }
+
+        .logo-upload {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .client-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .tab {
+                width: 100%;
+                text-align: center;
+            }
+            
+            .actions {
+                flex-direction: column;
+            }
+            
+            button {
+                margin-bottom: 10px;
+                width: 100%;
+            }
+
+            .client-info {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">Générateur de Devis</div>
+            <button class="theme-toggle" id="themeToggle">🌙</button>
+        </header>
+
+        <div class="tabs">
+            <div class="tab active" data-page="base-articles">Base Articles</div>
+            <div class="tab" data-page="saisie-devis">Saisie Devis</div>
+            <div class="tab" data-page="parametres">Paramètres</div>
+        </div>
+
+        <!-- Page Base Articles -->
+        <div id="base-articles" class="page active">
+            <div class="card">
+                <h2>Gestion des Articles</h2>
+                <div class="actions">
+                    <button id="addArticle">Ajouter un article</button>
+                    <button id="importCSV" class="secondary">Importer CSV</button>
+                    <button id="exportCSV" class="secondary">Exporter CSV</button>
+                </div>
+                <table id="articlesTable">
+                    <thead>
+                        <tr>
+                            <th>Nom Article</th>
+                            <th>Description</th>
+                            <th>Unité</th>
+                            <th>Prix Unitaire (USD)</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Les articles seront chargés ici dynamiquement -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Page Saisie Devis -->
+        <div id="saisie-devis" class="page">
+            <div class="card">
+                <h2>Création de Devis</h2>
+                
+                <div class="client-info">
+                    <div class="form-group">
+                        <label for="clientName">Nom du Client</label>
+                        <input type="text" id="clientName" placeholder="Nom du client">
+                    </div>
+                    <div class="form-group">
+                        <label for="quoteDate">Date du Devis</label>
+                        <input type="date" id="quoteDate">
+                    </div>
+                </div>
+                
+                <div class="search-container">
+                    <input type="text" id="articleSearch" placeholder="Rechercher un article...">
+                    <div class="search-results" id="searchResults"></div>
+                </div>
+
+                <div id="quoteItems">
+                    <!-- Les articles ajoutés au devis apparaîtront ici -->
+                </div>
+
+                <div class="quote-summary">
+                    <div class="summary-row">
+                        <span>Sous-total:</span>
+                        <span id="subtotal">0.00 USD</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Main d'œuvre (<span id="mainOeuvrePercent">0</span>%):</span>
+                        <span id="mainOeuvreValue">0.00 USD</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Imprévus (<span id="imprevuPercent">0</span>%):</span>
+                        <span id="imprevuValue">0.00 USD</span>
+                    </div>
+                    <div class="total">
+                        <span>Total:</span>
+                        <span id="totalUSD">0.00 USD</span>
+                    </div>
+                    <div class="total">
+                        <span>Total en FRC:</span>
+                        <span id="totalFRC">0.00 FRC</span>
+                    </div>
+                </div>
+
+                <div id="amountInWords" style="margin-top: 20px; font-style: italic;">
+                    <!-- Le montant en lettres apparaîtra ici -->
+                </div>
+
+                <div class="actions">
+                    <button id="generatePDF" class="secondary">Exporter en PDF</button>
+                    <button id="saveQuote">Enregistrer le devis</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page Paramètres -->
+        <div id="parametres" class="page">
+            <div class="card">
+                <h2>Paramètres</h2>
+                
+                <div class="form-group">
+                    <label for="userName">Nom</label>
+                    <input type="text" id="userName" placeholder="Votre nom">
+                </div>
+                
+                <div class="form-group">
+                    <label for="userCompany">Entreprise</label>
+                    <input type="text" id="userCompany" placeholder="Nom de votre entreprise">
+                </div>
+                
+                <div class="form-group">
+                    <label for="userAddress">Adresse</label>
+                    <textarea id="userAddress" placeholder="Votre adresse"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="userContact">Contact</label>
+                    <input type="text" id="userContact" placeholder="Email ou téléphone">
+                </div>
+                
+                <div class="form-group">
+                    <label for="slogan">Slogan</label>
+                    <input type="text" id="slogan" placeholder="Slogan de votre entreprise">
+                </div>
+                
+                <div class="form-group">
+                    <label for="marketingPhrase">Phrase de marketing</label>
+                    <textarea id="marketingPhrase" placeholder="Phrase d'accroche marketing"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="mainOeuvrePercentage">Pourcentage de main d'œuvre (%)</label>
+                    <input type="number" id="mainOeuvrePercentage" min="0" step="0.1">
+                </div>
+                
+                <div class="form-group">
+                    <label for="imprevuPercentage">Pourcentage d'imprévus (%)</label>
+                    <input type="number" id="imprevuPercentage" min="0" step="0.1">
+                </div>
+                
+                <div class="form-group">
+                    <label for="exchangeRate">Taux de change (1 USD = X FRC)</label>
+                    <input type="number" id="exchangeRate" min="1" step="0.1">
+                </div>
+                
+                <div class="form-group">
+                    <label>Logo</label>
+                    <div class="logo-upload">
+                        <input type="file" id="logoUpload" accept="image/*">
+                        <img id="logoPreview" class="logo-preview" src="" alt="Aperçu du logo">
+                        <button id="removeLogo" class="danger hidden">Supprimer le logo</button>
+                    </div>
+                </div>
+                
+                <div class="actions">
+                    <button id="saveSettings">Enregistrer les paramètres</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification" id="notification">Opération réussie!</div>
+
+    <!-- Modale pour ajouter/modifier un article -->
+    <div id="articleModal" class="modal hidden">
+        <div class="modal-content">
+            <h2 id="modalTitle">Ajouter un article</h2>
+            <div class="form-group">
+                <label for="articleName">Nom Article</label>
+                <input type="text" id="articleName">
+            </div>
+            <div class="form-group">
+                <label for="articleDescription">Description</label>
+                <textarea id="articleDescription"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="articleUnit">Unité</label>
+                <input type="text" id="articleUnit" placeholder="Heure, Jour, Unité, etc.">
+            </div>
+            <div class="form-group">
+                <label for="articlePrice">Prix Unitaire (USD)</label>
+                <input type="number" id="articlePrice" min="0" step="0.01">
+            </div>
+            <div class="actions">
+                <button id="cancelArticle">Annuler</button>
+                <button id="saveArticle">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+
+    <script>
+        // Variables globales
+        let articles = [];
+        let settings = {};
+        let currentQuote = [];
+        let editingArticleId = null;
+
+        // Éléments DOM
+        const themeToggle = document.getElementById('themeToggle');
+        const tabs = document.querySelectorAll('.tab');
+        const pages = document.querySelectorAll('.page');
+        const notification = document.getElementById('notification');
+        const logoUpload = document.getElementById('logoUpload');
+        const logoPreview = document.getElementById('logoPreview');
+        const removeLogo = document.getElementById('removeLogo');
+        const quoteDate = document.getElementById('quoteDate');
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', () => {
+            // Définir la date du jour par défaut
+            const today = new Date();
+            quoteDate.value = today.toISOString().split('T')[0];
+            
+            loadArticles();
+            loadSettings();
+            initEventListeners();
+            updateQuoteSummary();
+        });
+
+        // Chargement des articles depuis le localStorage
+        function loadArticles() {
+            const storedArticles = localStorage.getItem('articles');
+            if (storedArticles) {
+                articles = JSON.parse(storedArticles);
+                renderArticlesTable();
+            } else {
+                // Données par défaut
+                articles = [
+                    { id: 1, name: "Développement Frontend", description: "Création d'interfaces utilisateur", unit: "Heure", price: 50 },
+                    { id: 2, name: "Design UI/UX", description: "Conception d'interfaces utilisateur", unit: "Heure", price: 45 },
+                    { id: 3, name: "Intégration API", description: "Connexion à des services externes", unit: "Heure", price: 55 }
+                ];
+                saveArticles();
+                renderArticlesTable();
+            }
+        }
+
+        // Sauvegarde des articles dans le localStorage
+        function saveArticles() {
+            localStorage.setItem('articles', JSON.stringify(articles));
+        }
+
+        // Chargement des paramètres depuis le localStorage
+        function loadSettings() {
+            const storedSettings = localStorage.getItem('settings');
+            if (storedSettings) {
+                settings = JSON.parse(storedSettings);
+                applySettings();
+            } else {
+                // Paramètres par défaut
+                settings = {
+                    userName: "",
+                    userCompany: "",
+                    userAddress: "",
+                    userContact: "",
+                    slogan: "",
+                    marketingPhrase: "",
+                    mainOeuvrePercentage: 10,
+                    imprevuPercentage: 5,
+                    exchangeRate: 3000,
+                    companyLogo: ""
+                };
+                saveSettings();
+            }
+        }
+
+        // Application des paramètres dans l'interface
+        function applySettings() {
+            document.getElementById('userName').value = settings.userName || "";
+            document.getElementById('userCompany').value = settings.userCompany || "";
+            document.getElementById('userAddress').value = settings.userAddress || "";
+            document.getElementById('userContact').value = settings.userContact || "";
+            document.getElementById('slogan').value = settings.slogan || "";
+            document.getElementById('marketingPhrase').value = settings.marketingPhrase || "";
+            document.getElementById('mainOeuvrePercentage').value = settings.mainOeuvrePercentage || 10;
+            document.getElementById('imprevuPercentage').value = settings.imprevuPercentage || 5;
+            document.getElementById('exchangeRate').value = settings.exchangeRate || 3000;
+            
+            // Mettre à jour les pourcentages affichés dans le devis
+            document.getElementById('mainOeuvrePercent').textContent = settings.mainOeuvrePercentage || 10;
+            document.getElementById('imprevuPercent').textContent = settings.imprevuPercentage || 5;
+            
+            // Afficher le logo s'il existe
+            if (settings.companyLogo) {
+                logoPreview.src = settings.companyLogo;
+                removeLogo.classList.remove('hidden');
+            } else {
+                logoPreview.src = "";
+                removeLogo.classList.add('hidden');
+            }
+        }
+
+        // Sauvegarde des paramètres dans le localStorage
+        function saveSettings() {
+            localStorage.setItem('settings', JSON.stringify(settings));
+            showNotification("Paramètres enregistrés avec succès");
+        }
+
+        // Initialisation des écouteurs d'événements
+        function initEventListeners() {
+            // Changement de thème
+            themeToggle.addEventListener('click', toggleTheme);
+            
+            // Navigation par onglets
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const pageId = tab.getAttribute('data-page');
+                    switchPage(pageId);
+                });
+            });
+            
+            // Gestion des articles
+            document.getElementById('addArticle').addEventListener('click', () => {
+                openArticleModal();
+            });
+            
+            document.getElementById('saveArticle').addEventListener('click', saveArticle);
+            document.getElementById('cancelArticle').addEventListener('click', closeArticleModal);
+            
+            // Import/Export CSV
+            document.getElementById('importCSV').addEventListener('click', importCSV);
+            document.getElementById('exportCSV').addEventListener('click', exportCSV);
+            
+            // Recherche d'articles
+            document.getElementById('articleSearch').addEventListener('input', handleArticleSearch);
+            
+            // Paramètres
+            document.getElementById('saveSettings').addEventListener('click', () => {
+                settings.userName = document.getElementById('userName').value;
+                settings.userCompany = document.getElementById('userCompany').value;
+                settings.userAddress = document.getElementById('userAddress').value;
+                settings.userContact = document.getElementById('userContact').value;
+                settings.slogan = document.getElementById('slogan').value;
+                settings.marketingPhrase = document.getElementById('marketingPhrase').value;
+                settings.mainOeuvrePercentage = parseFloat(document.getElementById('mainOeuvrePercentage').value) || 10;
+                settings.imprevuPercentage = parseFloat(document.getElementById('imprevuPercentage').value) || 5;
+                settings.exchangeRate = parseFloat(document.getElementById('exchangeRate').value) || 3000;
+                
+                saveSettings();
+                updateQuoteSummary();
+            });
+            
+            // Gestion du logo
+            logoUpload.addEventListener('change', handleLogoUpload);
+            removeLogo.addEventListener('click', removeUploadedLogo);
+            
+            // Génération PDF
+            document.getElementById('generatePDF').addEventListener('click', generatePDF);
+            
+            // Sauvegarde du devis
+            document.getElementById('saveQuote').addEventListener('click', saveQuote);
+        }
+
+        // Gérer l'upload du logo
+        function handleLogoUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            if (!file.type.match('image.*')) {
+                showNotification("Veuillez sélectionner une image", "error");
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                logoPreview.src = e.target.result;
+                settings.companyLogo = e.target.result;
+                removeLogo.classList.remove('hidden');
+                saveSettings();
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Supprimer le logo uploadé
+        function removeUploadedLogo() {
+            logoPreview.src = "";
+            settings.companyLogo = "";
+            logoUpload.value = "";
+            removeLogo.classList.add('hidden');
+            saveSettings();
+        }
+
+        // Basculer entre les thèmes clair et sombre
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            if (currentTheme === 'dark') {
+                document.documentElement.removeAttribute('data-theme');
+                themeToggle.textContent = '🌙';
+            } else {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                themeToggle.textContent = '☀️';
+            }
+        }
+
+        // Changer de page
+        function switchPage(pageId) {
+            // Mettre à jour les onglets
+            tabs.forEach(tab => {
+                if (tab.getAttribute('data-page') === pageId) {
+                    tab.classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
+            
+            // Afficher la page correspondante
+            pages.forEach(page => {
+                if (page.id === pageId) {
+                    page.classList.add('active');
+                } else {
+                    page.classList.remove('active');
+                }
+            });
+        }
+
+        // Afficher le modal d'ajout/modification d'article
+        function openArticleModal(article = null) {
+            const modal = document.getElementById('articleModal');
+            const title = document.getElementById('modalTitle');
+            
+            if (article) {
+                title.textContent = "Modifier l'article";
+                document.getElementById('articleName').value = article.name;
+                document.getElementById('articleDescription').value = article.description;
+                document.getElementById('articleUnit').value = article.unit;
+                document.getElementById('articlePrice').value = article.price;
+                editingArticleId = article.id;
+            } else {
+                title.textContent = "Ajouter un article";
+                document.getElementById('articleName').value = "";
+                document.getElementById('articleDescription').value = "";
+                document.getElementById('articleUnit').value = "";
+                document.getElementById('articlePrice').value = "";
+                editingArticleId = null;
+            }
+            
+            modal.classList.remove('hidden');
+        }
+
+        // Fermer le modal d'article
+        function closeArticleModal() {
+            document.getElementById('articleModal').classList.add('hidden');
+        }
+
+        // Sauvegarder un article (ajout ou modification)
+        function saveArticle() {
+            const name = document.getElementById('articleName').value;
+            const description = document.getElementById('articleDescription').value;
+            const unit = document.getElementById('articleUnit').value;
+            const price = parseFloat(document.getElementById('articlePrice').value);
+            
+            if (!name || !unit || isNaN(price)) {
+                showNotification("Veuillez remplir tous les champs obligatoires", "error");
+                return;
+            }
+            
+            if (editingArticleId) {
+                // Modification d'un article existant
+                const index = articles.findIndex(a => a.id === editingArticleId);
+                if (index !== -1) {
+                    articles[index] = {
+                        id: editingArticleId,
+                        name,
+                        description,
+                        unit,
+                        price
+                    };
+                }
+            } else {
+                // Ajout d'un nouvel article
+                const newId = articles.length > 0 ? Math.max(...articles.map(a => a.id)) + 1 : 1;
+                articles.push({
+                    id: newId,
+                    name,
+                    description,
+                    unit,
+                    price
+                });
+            }
+            
+            saveArticles();
+            renderArticlesTable();
+            closeArticleModal();
+            showNotification("Article enregistré avec succès");
+        }
+
+        // Supprimer un article
+        function deleteArticle(id) {
+            if (confirm("Êtes-vous sûr de vouloir supprimer cet article ?")) {
+                articles = articles.filter(article => article.id !== id);
+                saveArticles();
+                renderArticlesTable();
+                showNotification("Article supprimé avec succès");
+            }
+        }
+
+        // Rendre le tableau des articles
+        function renderArticlesTable() {
+            const tbody = document.querySelector('#articlesTable tbody');
+            tbody.innerHTML = '';
+            
+            articles.forEach(article => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${article.name}</td>
+                    <td>${article.description}</td>
+                    <td>${article.unit}</td>
+                    <td>${article.price.toFixed(2)} USD</td>
+                    <td>
+                        <button class="edit" data-id="${article.id}">Modifier</button>
+                        <button class="danger delete" data-id="${article.id}">Supprimer</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+            
+            // Ajouter les écouteurs d'événements pour les boutons
+            document.querySelectorAll('.edit').forEach(button => {
+                button.addEventListener('click', () => {
+                    const id = parseInt(button.getAttribute('data-id'));
+                    const article = articles.find(a => a.id === id);
+                    if (article) openArticleModal(article);
+                });
+            });
+            
+            document.querySelectorAll('.delete').forEach(button => {
+                button.addEventListener('click', () => {
+                    const id = parseInt(button.getAttribute('data-id'));
+                    deleteArticle(id);
+                });
+            });
+        }
+
+        // Importer des articles depuis un fichier CSV
+        function importCSV() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.csv';
+            
+            input.onchange = e => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                
+                reader.onload = function(event) {
+                    const csvData = event.target.result;
+                    const lines = csvData.split('\n');
+                    const newArticles = [];
+                    
+                    for (let i = 1; i < lines.length; i++) {
+                        const line = lines[i].trim();
+                        if (!line) continue;
+                        
+                        const [name, description, unit, price] = line.split(',');
+                        if (name && unit && price) {
+                            newArticles.push({
+                                id: articles.length > 0 ? Math.max(...articles.map(a => a.id)) + 1 + (i - 1) : i,
+                                name: name.trim(),
+                                description: description ? description.trim() : "",
+                                unit: unit.trim(),
+                                price: parseFloat(price.trim())
+                            });
+                        }
+                    }
+                    
+                    if (newArticles.length > 0) {
+                        articles = [...articles, ...newArticles];
+                        saveArticles();
+                        renderArticlesTable();
+                        showNotification(`${newArticles.length} articles importés avec succès`);
+                    } else {
+                        showNotification("Aucun article valide trouvé dans le fichier", "error");
+                    }
+                };
+                
+                reader.readAsText(file);
+            };
+            
+            input.click();
+        }
+
+        // Exporter les articles vers un fichier CSV
+        function exportCSV() {
+            if (articles.length === 0) {
+                showNotification("Aucun article à exporter", "error");
+                return;
+            }
+            
+            let csvContent = "Nom,Description,Unité,Prix\n";
+            articles.forEach(article => {
+                csvContent += `"${article.name}","${article.description}","${article.unit}",${article.price}\n`;
+            });
+            
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'articles.csv');
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showNotification("Articles exportés avec succès");
+        }
+
+        // Recherche d'articles pour le devis
+        function handleArticleSearch() {
+            const searchTerm = document.getElementById('articleSearch').value.toLowerCase();
+            const resultsContainer = document.getElementById('searchResults');
+            
+            if (searchTerm.length < 2) {
+                resultsContainer.style.display = 'none';
+                return;
+            }
+            
+            const filteredArticles = articles.filter(article => 
+                article.name.toLowerCase().includes(searchTerm) || 
+                article.description.toLowerCase().includes(searchTerm)
+            );
+            
+            if (filteredArticles.length === 0) {
+                resultsContainer.innerHTML = '<div class="search-result-item">Aucun résultat</div>';
+            } else {
+                resultsContainer.innerHTML = '';
+                filteredArticles.forEach(article => {
+                    const item = document.createElement('div');
+                    item.className = 'search-result-item';
+                    item.textContent = `${article.name} - ${article.price.toFixed(2)} USD/${article.unit}`;
+                    item.setAttribute('data-id', article.id);
+                    item.addEventListener('click', () => {
+                        addArticleToQuote(article);
+                        document.getElementById('articleSearch').value = '';
+                        resultsContainer.style.display = 'none';
+                    });
+                    resultsContainer.appendChild(item);
+                });
+            }
+            
+            resultsContainer.style.display = 'block';
+        }
+
+        // Ajouter un article au devis
+        function addArticleToQuote(article) {
+            // Vérifier si l'article est déjà dans le devis
+            const existingItemIndex = currentQuote.findIndex(item => item.article.id === article.id);
+            
+            if (existingItemIndex !== -1) {
+                // Incrémenter la quantité si l'article existe déjà
+                currentQuote[existingItemIndex].quantity += 1;
+            } else {
+                // Ajouter un nouvel article avec une quantité de 1
+                currentQuote.push({
+                    article,
+                    quantity: 1
+                });
+            }
+            
+            renderQuoteItems();
+            updateQuoteSummary();
+        }
+
+        // Modifier la quantité d'un article dans le devis
+        function updateQuoteItemQuantity(id, quantity) {
+            const itemIndex = currentQuote.findIndex(item => item.article.id === id);
+            
+            if (itemIndex !== -1) {
+                if (quantity <= 0) {
+                    currentQuote.splice(itemIndex, 1);
+                } else {
+                    currentQuote[itemIndex].quantity = quantity;
+                }
+                
+                renderQuoteItems();
+                updateQuoteSummary();
+            }
+        }
+
+        // Rendre les articles du devis
+        function renderQuoteItems() {
+            const container = document.getElementById('quoteItems');
+            container.innerHTML = '';
+            
+            if (currentQuote.length === 0) {
+                container.innerHTML = '<p>Aucun article ajouté au devis</p>';
+                return;
+            }
+            
+            currentQuote.forEach(item => {
+                const itemElement = document.createElement('div');
+                itemElement.className = 'quote-item';
+                itemElement.innerHTML = `
+                    <div>
+                        <strong>${item.article.name}</strong>
+                        <p>${item.article.description} - ${item.article.price.toFixed(2)} USD/${item.article.unit}</p>
+                    </div>
+                    <div>
+                        <input type="number" min="1" value="${item.quantity}" 
+                               onchange="updateQuoteItemQuantity(${item.article.id}, parseInt(this.value))">
+                        <span>${item.article.unit}</span>
+                    </div>
+                    <div>
+                        <strong>${(item.quantity * item.article.price).toFixed(2)} USD</strong>
+                    </div>
+                    <button class="danger" onclick="updateQuoteItemQuantity(${item.article.id}, 0)">×</button>
+                `;
+                container.appendChild(itemElement);
+            });
+        }
+
+        // Mettre à jour le résumé du devis
+        function updateQuoteSummary() {
+            const subtotal = currentQuote.reduce((sum, item) => sum + (item.quantity * item.article.price), 0);
+            const mainOeuvre = subtotal * (settings.mainOeuvrePercentage / 100);
+            const imprevu = subtotal * (settings.imprevuPercentage / 100);
+            const totalUSD = subtotal + mainOeuvre + imprevu;
+            const totalFRC = totalUSD * settings.exchangeRate;
+            
+            document.getElementById('subtotal').textContent = `${subtotal.toFixed(2)} USD`;
+            document.getElementById('mainOeuvreValue').textContent = `${mainOeuvre.toFixed(2)} USD`;
+            document.getElementById('imprevuValue').textContent = `${imprevu.toFixed(2)} USD`;
+            document.getElementById('totalUSD').textContent = `${totalUSD.toFixed(2)} USD`;
+            document.getElementById('totalFRC').textContent = `${totalFRC.toFixed(2)} FRC`;
+            
+            // Mettre à jour le montant en toutes lettres
+            updateAmountInWords(totalUSD, totalFRC);
+        }
+
+        // Mettre à jour le montant en toutes lettres
+        function updateAmountInWords(totalUSD, totalFRC) {
+            const amountInWords = document.getElementById('amountInWords');
+            
+            if (totalUSD > 0) {
+                const usdInWords = numberToWords(totalUSD);
+                const frcInWords = numberToWords(totalFRC);
+                
+                amountInWords.innerHTML = `
+                    <p>Nous disons <strong>${usdInWords} dollars américains</strong> soit <strong>${frcInWords} francs congolais</strong></p>
+                `;
+            } else {
+                amountInWords.innerHTML = '';
+            }
+        }
+
+        // Convertir un nombre en lettres
+        function numberToWords(num) {
+            const units = ['', 'un', 'deux', 'trois', 'quatre', 'cinq', 'six', 'sept', 'huit', 'neuf'];
+            const teens = ['dix', 'onze', 'douze', 'treize', 'quatorze', 'quinze', 'seize', 'dix-sept', 'dix-huit', 'dix-neuf'];
+            const tens = ['', 'dix', 'vingt', 'trente', 'quarante', 'cinquante', 'soixante', 'soixante-dix', 'quatre-vingt', 'quatre-vingt-dix'];
+            const scales = ['', 'mille', 'million', 'milliard'];
+            
+            if (num === 0) return 'zéro';
+            
+            // Séparer les parties entière et décimale
+            const integerPart = Math.floor(num);
+            const decimalPart = Math.round((num - integerPart) * 100);
+            
+            let words = convertNumber(integerPart);
+            
+            if (decimalPart > 0) {
+                words += ' virgule ' + convertNumber(decimalPart);
+            }
+            
+            return words;
+            
+            function convertNumber(num) {
+                if (num === 0) return '';
+                
+                let words = '';
+                
+                for (let i = 0; num > 0; i++) {
+                    if (num % 1000 !== 0) {
+                        words = convertThreeDigits(num % 1000) + (i > 0 ? ' ' + scales[i] + ' ' : '') + words;
+                    }
+                    num = Math.floor(num / 1000);
+                }
+                
+                return words.trim();
+            }
+            
+            function convertThreeDigits(num) {
+                let words = '';
+                
+                // Centaines
+                if (num >= 100) {
+                    words += units[Math.floor(num / 100)] + ' cent';
+                    num %= 100;
+                    if (num > 0) words += ' ';
+                }
+                
+                // Dixaines et unités
+                if (num >= 10 && num <= 19) {
+                    words += teens[num - 10];
+                } else {
+                    if (num >= 20) {
+                        words += tens[Math.floor(num / 10)];
+                        num %= 10;
+                        if (num > 0) words += '-';
+                    }
+                    if (num > 0) {
+                        words += units[num];
+                    }
+                }
+                
+                return words;
+            }
+        }
+
+        // Générer le PDF du devis
+        function generatePDF() {
+            if (currentQuote.length === 0) {
+                showNotification("Le devis est vide", "error");
+                return;
+            }
+            
+            const clientName = document.getElementById('clientName').value || "Client";
+            const quoteDate = document.getElementById('quoteDate').value;
+            const formattedDate = quoteDate ? new Date(quoteDate).toLocaleDateString('fr-FR') : new Date().toLocaleDateString('fr-FR');
+            
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // En-tête avec logo et informations
+            doc.setFontSize(20);
+            doc.setTextColor(40, 40, 40);
+            doc.text("DEVIS", 105, 20, { align: "center" });
+            
+            // Date en haut à droite
+            doc.setFontSize(12);
+            doc.text(`Date: ${formattedDate}`, 180, 15, { align: "right" });
+            
+            // Nom du client
+            doc.text(`Client: ${clientName}`, 180, 22, { align: "right" });
+            
+            // Ajouter le logo s'il existe
+            if (settings.companyLogo) {
+                try {
+                    doc.addImage(settings.companyLogo, 'PNG', 15, 15, 30, 15);
+                } catch (e) {
+                    console.error("Erreur lors de l'ajout du logo:", e);
+                }
+            }
+            
+            // Informations de l'entreprise
+            doc.setFontSize(10);
+            let yPosition = 40;
+            doc.text(settings.userCompany || "Votre entreprise", 15, yPosition);
+            yPosition += 5;
+            doc.text(settings.userName || "Votre nom", 15, yPosition);
+            yPosition += 5;
+            if (settings.userAddress) {
+                const addressLines = doc.splitTextToSize(settings.userAddress, 80);
+                doc.text(addressLines, 15, yPosition);
+                yPosition += addressLines.length * 5;
+            }
+            yPosition += 5;
+            doc.text(settings.userContact || "Votre contact", 15, yPosition);
+            
+            // Slogan
+            if (settings.slogan) {
+                doc.setFontSize(12);
+                doc.setTextColor(100);
+                doc.text(settings.slogan, 105, yPosition, { align: "center" });
+                doc.setTextColor(40);
+            }
+            
+            // Ligne de séparation
+            yPosition += 10;
+            doc.line(15, yPosition, 195, yPosition);
+            
+            // Tableau des articles
+            const tableData = currentQuote.map(item => [
+                item.article.name,
+                item.article.description,
+                item.quantity,
+                item.article.unit,
+                `${item.article.price.toFixed(2)} USD`,
+                `${(item.quantity * item.article.price).toFixed(2)} USD`
+            ]);
+            
+            // Ajouter les totaux
+            const subtotal = currentQuote.reduce((sum, item) => sum + (item.quantity * item.article.price), 0);
+            const mainOeuvre = subtotal * (settings.mainOeuvrePercentage / 100);
+            const imprevu = subtotal * (settings.imprevuPercentage / 100);
+            const totalUSD = subtotal + mainOeuvre + imprevu;
+            const totalFRC = totalUSD * settings.exchangeRate;
+            
+            tableData.push([
+                { content: "SOUS-TOTAL", colSpan: 5, styles: { fontStyle: 'bold', halign: 'right' } },
+                `${subtotal.toFixed(2)} USD`
+            ]);
+            
+            tableData.push([
+                { content: `Main d'œuvre (${settings.mainOeuvrePercentage}%)`, colSpan: 5, styles: { halign: 'right' } },
+                `${mainOeuvre.toFixed(2)} USD`
+            ]);
+            
+            tableData.push([
+                { content: `Imprévus (${settings.imprevuPercentage}%)`, colSpan: 5, styles: { halign: 'right' } },
+                `${imprevu.toFixed(2)} USD`
+            ]);
+            
+            tableData.push([
+                { content: "TOTAL USD", colSpan: 5, styles: { fontStyle: 'bold', halign: 'right' } },
+                { content: `${totalUSD.toFixed(2)} USD`, styles: { fontStyle: 'bold' } }
+            ]);
+            
+            tableData.push([
+                { content: "TOTAL FRC", colSpan: 5, styles: { fontStyle: 'bold', halign: 'right' } },
+                { content: `${totalFRC.toFixed(2)} FRC`, styles: { fontStyle: 'bold' } }
+            ]);
+            
+            doc.autoTable({
+                startY: yPosition + 5,
+                head: [['Article', 'Description', 'Qté', 'Unité', 'Prix Unitaire', 'Total']],
+                body: tableData,
+                theme: 'grid',
+                headStyles: { fillColor: [52, 152, 219] },
+                footStyles: { fillColor: [52, 152, 219] }
+            });
+            
+            // Montant en toutes lettres
+            const finalY = doc.lastAutoTable.finalY + 10;
+            doc.setFontSize(10);
+            doc.text(`Nous disons ${numberToWords(totalUSD)} dollars américains soit ${numberToWords(totalFRC)} francs congolais`, 14, finalY);
+            
+            // Phrase de marketing
+            if (settings.marketingPhrase) {
+                doc.setFontSize(9);
+                doc.setTextColor(100);
+                doc.text(settings.marketingPhrase, 105, finalY + 10, { align: "center" });
+            }
+            
+            // Pied de page
+            const pageCount = doc.internal.getNumberOfPages();
+            for (let i = 1; i <= pageCount; i++) {
+                doc.setPage(i);
+                doc.setFontSize(8);
+                doc.text(`Page ${i} sur ${pageCount}`, 195, 285, { align: "right" });
+            }
+            
+            // Sauvegarder le PDF
+            const fileName = `Devis_${clientName.replace(/\s+/g, '_')}_${formattedDate.replace(/\//g, '-')}.pdf`;
+            doc.save(fileName);
+            
+            showNotification("Devis exporté en PDF avec succès");
+        }
+
+        // Sauvegarder le devis dans l'historique
+        function saveQuote() {
+            if (currentQuote.length === 0) {
+                showNotification("Le devis est vide", "error");
+                return;
+            }
+            
+            const quotes = JSON.parse(localStorage.getItem('quotes') || '[]');
+            const subtotal = currentQuote.reduce((sum, item) => sum + (item.quantity * item.article.price), 0);
+            const mainOeuvre = subtotal * (settings.mainOeuvrePercentage / 100);
+            const imprevu = subtotal * (settings.imprevuPercentage / 100);
+            const totalUSD = subtotal + mainOeuvre + imprevu;
+            
+            quotes.push({
+                id: quotes.length > 0 ? Math.max(...quotes.map(q => q.id)) + 1 : 1,
+                date: new Date().toISOString(),
+                clientName: document.getElementById('clientName').value || "Client",
+                items: currentQuote,
+                subtotal,
+                mainOeuvre,
+                imprevu,
+                totalUSD,
+                totalFRC: totalUSD * settings.exchangeRate,
+            });
+            
+            localStorage.setItem('quotes', JSON.stringify(quotes));
+            showNotification("Devis enregistré dans l'historique");
+        }
+
+        // Afficher une notification
+        function showNotification(message, type = "success") {
+            notification.textContent = message;
+            notification.style.backgroundColor = type === "success" ? "#2ecc71" : "#e74c3c";
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Exposer certaines fonctions au scope global pour les événements inline
+        window.updateQuoteItemQuantity = updateQuoteItemQuantity;
+    </script>
+</body>
+</html>
